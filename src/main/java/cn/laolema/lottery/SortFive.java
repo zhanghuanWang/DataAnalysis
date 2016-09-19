@@ -129,6 +129,10 @@ public class SortFive {
         }
     }
 
+    public int getNumInt() {
+        return myriabit * 10000 + kikobit * 1000 + hundreds * 100 + decade * 10 + unit;
+    }
+
     @Override
     public String toString() {
         return new Gson().toJson(this);

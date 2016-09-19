@@ -40,6 +40,7 @@ public class PLWLottery {
 //        gapDate();
         loadPlw();
 
+        getNone();
         createExcel("/home/wzh/lottery_plw.xls");
     }
 
@@ -51,7 +52,7 @@ public class PLWLottery {
             // 在Excel工作簿中建一工作表，其名为缺省值
             // 如要新建一名为"效益指标"的工作表，其语句为：
             // HSSFSheet sheet = workbook.createSheet("效益指标");
-            HSSFSheet sheet = workbook.createSheet();
+            HSSFSheet sheet = workbook.createSheet("排列五");
             HSSFRow row = sheet.createRow((short) 0);
             HSSFCell hssfCell = row.createCell((short) 0);
             hssfCell.setCellType(HSSFCell.CELL_TYPE_STRING);
@@ -82,9 +83,9 @@ public class PLWLottery {
             hssfCell.setCellType(HSSFCell.CELL_TYPE_STRING);
             hssfCell.setCellValue("中奖注数");
 
-            for(int i = 0; i< list.size();i++){
+            for (int i = 0; i < list.size(); i++) {
                 SortFive sf = list.get(i);
-                row = sheet.createRow((short) (i+1));
+                row = sheet.createRow((short) (i + 1));
 
                 hssfCell = row.createCell((short) 0);
                 hssfCell.setCellType(HSSFCell.CELL_TYPE_STRING);
@@ -92,30 +93,195 @@ public class PLWLottery {
 
                 hssfCell = row.createCell((short) 1);
                 hssfCell.setCellType(HSSFCell.CELL_TYPE_NUMERIC);
-                hssfCell.setCellValue(sf.getMyriabit()+"");
+                hssfCell.setCellValue(sf.getMyriabit() + "");
                 hssfCell = row.createCell((short) 2);
                 hssfCell.setCellType(HSSFCell.CELL_TYPE_NUMERIC);
-                hssfCell.setCellValue(sf.getKikobit()+"");
+                hssfCell.setCellValue(sf.getKikobit() + "");
                 hssfCell = row.createCell((short) 3);
                 hssfCell.setCellType(HSSFCell.CELL_TYPE_NUMERIC);
-                hssfCell.setCellValue(sf.getHundreds());
+                hssfCell.setCellValue(sf.getHundreds() + "");
                 hssfCell = row.createCell((short) 4);
                 hssfCell.setCellType(HSSFCell.CELL_TYPE_NUMERIC);
-                hssfCell.setCellValue(sf.getDecade());
+                hssfCell.setCellValue(sf.getDecade() + "");
                 hssfCell = row.createCell((short) 5);
                 hssfCell.setCellType(HSSFCell.CELL_TYPE_NUMERIC);
-                hssfCell.setCellValue(sf.getUnit());
+                hssfCell.setCellValue(sf.getUnit() + "");
                 hssfCell = row.createCell((short) 6);
                 hssfCell.setCellType(HSSFCell.CELL_TYPE_NUMERIC);
-                hssfCell.setCellValue(sf.getNumInt());
+                hssfCell.setCellValue(sf.getNumInt() + "");
                 hssfCell = row.createCell((short) 7);
                 hssfCell.setCellType(HSSFCell.CELL_TYPE_STRING);
-                hssfCell.setCellValue(String.format("%05d",sf.getNumInt()));
+                hssfCell.setCellValue(String.format("%05d", sf.getNumInt()));
                 hssfCell = row.createCell((short) 8);
                 hssfCell.setCellType(HSSFCell.CELL_TYPE_STRING);
-                hssfCell.setCellValue(sf.getNumber()+"");
+                hssfCell.setCellValue(sf.getNumber() + "");
             }
 
+            sheet = workbook.createSheet("频率表0");
+            row = sheet.createRow((short) 0);
+            hssfCell = row.createCell((short) 0);
+            hssfCell.setCellType(HSSFCell.CELL_TYPE_STRING);
+            hssfCell.setCellValue("数字");
+            hssfCell = row.createCell((short) 1);
+            hssfCell.setCellType(HSSFCell.CELL_TYPE_STRING);
+            hssfCell.setCellValue("频率");
+
+            for (int i = 0; i < 20000; i++) {
+                Integer f = mapRest.get(i);
+
+                row = sheet.createRow((short) (i + 1));
+
+                hssfCell = row.createCell((short) 0);
+                hssfCell.setCellType(HSSFCell.CELL_TYPE_STRING);
+                hssfCell.setCellValue(String.format("%05d", i));
+
+                hssfCell = row.createCell((short) 1);
+                hssfCell.setCellType(HSSFCell.CELL_TYPE_NUMERIC);
+                hssfCell.setCellValue(f + "");
+
+            }
+            sheet = workbook.createSheet("频率表1");
+            row = sheet.createRow((short) 0);
+            hssfCell = row.createCell((short) 0);
+            hssfCell.setCellType(HSSFCell.CELL_TYPE_STRING);
+            hssfCell.setCellValue("数字");
+            hssfCell = row.createCell((short) 1);
+            hssfCell.setCellType(HSSFCell.CELL_TYPE_STRING);
+            hssfCell.setCellValue("频率");
+
+            for (int i = 20000; i < 40000; i++) {
+                Integer f = mapRest.get(i);
+
+                row = sheet.createRow((short) (i + 1 - 20000));
+
+                hssfCell = row.createCell((short) 0);
+                hssfCell.setCellType(HSSFCell.CELL_TYPE_STRING);
+                hssfCell.setCellValue(String.format("%05d", i));
+
+                hssfCell = row.createCell((short) 1);
+                hssfCell.setCellType(HSSFCell.CELL_TYPE_NUMERIC);
+                hssfCell.setCellValue(f + "");
+
+            }
+            sheet = workbook.createSheet("频率表2");
+            row = sheet.createRow((short) 0);
+            hssfCell = row.createCell((short) 0);
+            hssfCell.setCellType(HSSFCell.CELL_TYPE_STRING);
+            hssfCell.setCellValue("数字");
+            hssfCell = row.createCell((short) 1);
+            hssfCell.setCellType(HSSFCell.CELL_TYPE_STRING);
+            hssfCell.setCellValue("频率");
+
+            for (int i = 40000; i < 60000; i++) {
+                Integer f = mapRest.get(i);
+
+                row = sheet.createRow((short) (i + 1 - 40000));
+
+                hssfCell = row.createCell((short) 0);
+                hssfCell.setCellType(HSSFCell.CELL_TYPE_STRING);
+                hssfCell.setCellValue(String.format("%05d", i));
+
+                hssfCell = row.createCell((short) 1);
+                hssfCell.setCellType(HSSFCell.CELL_TYPE_NUMERIC);
+                hssfCell.setCellValue(f + "");
+
+            }
+            sheet = workbook.createSheet("频率表3");
+            row = sheet.createRow((short) 0);
+            hssfCell = row.createCell((short) 0);
+            hssfCell.setCellType(HSSFCell.CELL_TYPE_STRING);
+            hssfCell.setCellValue("数字");
+            hssfCell = row.createCell((short) 1);
+            hssfCell.setCellType(HSSFCell.CELL_TYPE_STRING);
+            hssfCell.setCellValue("频率");
+
+            for (int i = 60000; i < 80000; i++) {
+                Integer f = mapRest.get(i);
+
+                row = sheet.createRow((short) (i + 1 - 60000));
+
+                hssfCell = row.createCell((short) 0);
+                hssfCell.setCellType(HSSFCell.CELL_TYPE_STRING);
+                hssfCell.setCellValue(String.format("%05d", i));
+
+                hssfCell = row.createCell((short) 1);
+                hssfCell.setCellType(HSSFCell.CELL_TYPE_NUMERIC);
+                hssfCell.setCellValue(f + "");
+
+            }
+            sheet = workbook.createSheet("频率表4");
+            row = sheet.createRow((short) 0);
+            hssfCell = row.createCell((short) 0);
+            hssfCell.setCellType(HSSFCell.CELL_TYPE_STRING);
+            hssfCell.setCellValue("数字");
+            hssfCell = row.createCell((short) 1);
+            hssfCell.setCellType(HSSFCell.CELL_TYPE_STRING);
+            hssfCell.setCellValue("频率");
+
+            for (int i = 80000; i < 100000; i++) {
+                Integer f = mapRest.get(i);
+
+                row = sheet.createRow((short) (i + 1 - 80000));
+
+                hssfCell = row.createCell((short) 0);
+                hssfCell.setCellType(HSSFCell.CELL_TYPE_STRING);
+                hssfCell.setCellValue(String.format("%05d", i));
+
+                hssfCell = row.createCell((short) 1);
+                hssfCell.setCellType(HSSFCell.CELL_TYPE_NUMERIC);
+                hssfCell.setCellValue(f + "");
+
+            }
+
+            sheet = workbook.createSheet("单个频率表");
+            row = sheet.createRow((short) 0);
+            hssfCell = row.createCell((short) 0);
+            hssfCell.setCellType(HSSFCell.CELL_TYPE_STRING);
+            hssfCell.setCellValue("数字");
+            hssfCell = row.createCell((short) 1);
+            hssfCell.setCellType(HSSFCell.CELL_TYPE_STRING);
+            hssfCell.setCellValue("万位");
+            hssfCell = row.createCell((short) 2);
+            hssfCell.setCellType(HSSFCell.CELL_TYPE_STRING);
+            hssfCell.setCellValue("千位");
+            hssfCell = row.createCell((short) 3);
+            hssfCell.setCellType(HSSFCell.CELL_TYPE_STRING);
+            hssfCell.setCellValue("百位");
+            hssfCell = row.createCell((short) 4);
+            hssfCell.setCellType(HSSFCell.CELL_TYPE_STRING);
+            hssfCell.setCellValue("十位");
+            hssfCell = row.createCell((short) 5);
+            hssfCell.setCellType(HSSFCell.CELL_TYPE_STRING);
+            hssfCell.setCellValue("个位");
+
+            for (int i = 0; i < 10; i++) {
+                Integer w = mapW.get(i);
+                Integer k = mapK.get(i);
+                Integer b = mapB.get(i);
+                Integer s = mapS.get(i);
+                Integer g = mapG.get(i);
+                row = sheet.createRow((short) (i + 1));
+
+                hssfCell = row.createCell((short) 0);
+                hssfCell.setCellType(HSSFCell.CELL_TYPE_STRING);
+                hssfCell.setCellValue(i + "");
+
+                hssfCell = row.createCell((short) 1);
+                hssfCell.setCellType(HSSFCell.CELL_TYPE_NUMERIC);
+                hssfCell.setCellValue(w + "");
+                hssfCell = row.createCell((short) 2);
+                hssfCell.setCellType(HSSFCell.CELL_TYPE_NUMERIC);
+                hssfCell.setCellValue(k + "");
+                hssfCell = row.createCell((short) 3);
+                hssfCell.setCellType(HSSFCell.CELL_TYPE_NUMERIC);
+                hssfCell.setCellValue(b + "");
+                hssfCell = row.createCell((short) 4);
+                hssfCell.setCellType(HSSFCell.CELL_TYPE_NUMERIC);
+                hssfCell.setCellValue(s + "");
+                hssfCell = row.createCell((short) 5);
+                hssfCell.setCellType(HSSFCell.CELL_TYPE_NUMERIC);
+                hssfCell.setCellValue(g + "");
+            }
 
             // 新建一输出文件流
             FileOutputStream fOut = new FileOutputStream(outputFile);
@@ -138,7 +304,6 @@ public class PLWLottery {
 
         return cell;
     }
-
 
 
     public static void getNone() {
@@ -193,16 +358,16 @@ public class PLWLottery {
         }
 
 
-        Iterator<Map.Entry<Integer, SortFive>> entries = map.entrySet().iterator();
+        Iterator<Map.Entry<Integer, Integer>> entries = mapW.entrySet().iterator();
 
         while (entries.hasNext()) {
 
-            Map.Entry<Integer, SortFive> entry = entries.next();
+            Map.Entry<Integer, Integer> entry = entries.next();
             Integer key = entry.getKey();
 
-            Integer integer = mapRest.get(key);
+            Integer integer = entry.getValue();
             if (integer != null) {
-
+                System.out.println(key + ":" + integer);
             }
 
         }
