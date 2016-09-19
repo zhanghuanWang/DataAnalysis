@@ -1,16 +1,21 @@
 package cn.laolema.lottery;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import org.apache.commons.io.FileUtils;
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by wzh on 16-8-29.
@@ -20,13 +25,203 @@ public class PLWLottery {
     public static String URL_BASE = "http://kaijiang.500.com/shtml/plw/";
 
     public static int startIssue = 4001;
-    public static int endIssue = 16366;
+    public static int endIssue = 16256;
 
     public static List<SortFive> list = new ArrayList<SortFive>();
+    public static Map<Integer, SortFive> map = new HashMap<Integer, SortFive>();
+    public static Map<Integer, Integer> mapRest = new HashMap<Integer, Integer>();
+    public static Map<Integer, Integer> mapW = new HashMap<Integer, Integer>();
+    public static Map<Integer, Integer> mapK = new HashMap<Integer, Integer>();
+    public static Map<Integer, Integer> mapB = new HashMap<Integer, Integer>();
+    public static Map<Integer, Integer> mapS = new HashMap<Integer, Integer>();
+    public static Map<Integer, Integer> mapG = new HashMap<Integer, Integer>();
 
     public static void main(String args[]) {
+//        gapDate();
+        loadPlw();
+
+        createExcel("/home/wzh/lottery_plw.xls");
+    }
 
 
+    public static void createExcel(String outputFile) {
+        try {
+            // 创建新的Excel 工作簿
+            HSSFWorkbook workbook = new HSSFWorkbook();
+            // 在Excel工作簿中建一工作表，其名为缺省值
+            // 如要新建一名为"效益指标"的工作表，其语句为：
+            // HSSFSheet sheet = workbook.createSheet("效益指标");
+            HSSFSheet sheet = workbook.createSheet();
+            HSSFRow row = sheet.createRow((short) 0);
+            HSSFCell hssfCell = row.createCell((short) 0);
+            hssfCell.setCellType(HSSFCell.CELL_TYPE_STRING);
+            hssfCell.setCellValue("期号");
+
+            hssfCell = row.createCell((short) 1);
+            hssfCell.setCellType(HSSFCell.CELL_TYPE_STRING);
+            hssfCell.setCellValue("万");
+            hssfCell = row.createCell((short) 2);
+            hssfCell.setCellType(HSSFCell.CELL_TYPE_STRING);
+            hssfCell.setCellValue("千");
+            hssfCell = row.createCell((short) 3);
+            hssfCell.setCellType(HSSFCell.CELL_TYPE_STRING);
+            hssfCell.setCellValue("百");
+            hssfCell = row.createCell((short) 4);
+            hssfCell.setCellType(HSSFCell.CELL_TYPE_STRING);
+            hssfCell.setCellValue("十");
+            hssfCell = row.createCell((short) 5);
+            hssfCell.setCellType(HSSFCell.CELL_TYPE_STRING);
+            hssfCell.setCellValue("个");
+            hssfCell = row.createCell((short) 6);
+            hssfCell.setCellType(HSSFCell.CELL_TYPE_STRING);
+            hssfCell.setCellValue("号码1");
+            hssfCell = row.createCell((short) 7);
+            hssfCell.setCellType(HSSFCell.CELL_TYPE_STRING);
+            hssfCell.setCellValue("号码2");
+            hssfCell = row.createCell((short) 8);
+            hssfCell.setCellType(HSSFCell.CELL_TYPE_STRING);
+            hssfCell.setCellValue("中奖注数");
+
+            for(int i = 0; i< list.size();i++){
+                SortFive sf = list.get(i);
+                row = sheet.createRow((short) (i+1));
+
+                hssfCell = row.createCell((short) 0);
+                hssfCell.setCellType(HSSFCell.CELL_TYPE_STRING);
+                hssfCell.setCellValue(sf.getIssue());
+
+                hssfCell = row.createCell((short) 1);
+                hssfCell.setCellType(HSSFCell.CELL_TYPE_NUMERIC);
+                hssfCell.setCellValue(sf.getMyriabit()+"");
+                hssfCell = row.createCell((short) 2);
+                hssfCell.setCellType(HSSFCell.CELL_TYPE_NUMERIC);
+                hssfCell.setCellValue(sf.getKikobit()+"");
+                hssfCell = row.createCell((short) 3);
+                hssfCell.setCellType(HSSFCell.CELL_TYPE_NUMERIC);
+                hssfCell.setCellValue(sf.getHundreds());
+                hssfCell = row.createCell((short) 4);
+                hssfCell.setCellType(HSSFCell.CELL_TYPE_NUMERIC);
+                hssfCell.setCellValue(sf.getDecade());
+                hssfCell = row.createCell((short) 5);
+                hssfCell.setCellType(HSSFCell.CELL_TYPE_NUMERIC);
+                hssfCell.setCellValue(sf.getUnit());
+                hssfCell = row.createCell((short) 6);
+                hssfCell.setCellType(HSSFCell.CELL_TYPE_NUMERIC);
+                hssfCell.setCellValue(sf.getNumInt());
+                hssfCell = row.createCell((short) 7);
+                hssfCell.setCellType(HSSFCell.CELL_TYPE_STRING);
+                hssfCell.setCellValue(String.format("%05d",sf.getNumInt()));
+                hssfCell = row.createCell((short) 8);
+                hssfCell.setCellType(HSSFCell.CELL_TYPE_STRING);
+                hssfCell.setCellValue(sf.getNumber()+"");
+            }
+
+
+            // 新建一输出文件流
+            FileOutputStream fOut = new FileOutputStream(outputFile);
+            // 把相应的Excel 工作簿存盘
+            workbook.write(fOut);
+            fOut.flush();
+            // 操作结束，关闭文件
+            fOut.close();
+            System.out.println("文件生成...");
+        } catch (Exception e) {
+            System.out.println("已运行 xlCreate() : " + e);
+        }
+    }
+
+    private static HSSFCell creatSheetData(HSSFSheet sheet, int rowIndex, int cellIndex) {
+        // 在索引0的位置创建行（最顶端的行）
+        HSSFRow row = sheet.createRow((short) rowIndex);
+        //在索引0的位置创建单元格（左上端）
+        HSSFCell cell = row.createCell((short) cellIndex);
+
+        return cell;
+    }
+
+
+
+    public static void getNone() {
+        //0~99999
+        for (int i = 0; i < 100000; i++) {
+            mapRest.put(i, 0);
+        }
+        for (int i = 0; i < 10; i++) {
+            mapW.put(i, 0);
+        }
+        for (int i = 0; i < 10; i++) {
+            mapK.put(i, 0);
+        }
+        for (int i = 0; i < 10; i++) {
+            mapB.put(i, 0);
+        }
+        for (int i = 0; i < 10; i++) {
+            mapS.put(i, 0);
+        }
+        for (int i = 0; i < 10; i++) {
+            mapG.put(i, 0);
+        }
+        for (int i = 0; i < list.size(); i++) {
+            SortFive sortFive = list.get(i);
+            int numInt = sortFive.getNumInt();
+            Integer integer = mapRest.get(numInt);
+            mapRest.put(numInt, ++integer);
+
+
+            int w = sortFive.getMyriabit();
+            int k = sortFive.getKikobit();
+            int b = sortFive.getHundreds();
+            int s = sortFive.getDecade();
+            int g = sortFive.getUnit();
+
+            Integer i1 = mapW.get(w);
+            mapW.put(w, ++i1);
+
+            Integer i2 = mapK.get(k);
+            mapK.put(k, ++i2);
+
+            Integer i3 = mapB.get(b);
+            mapB.put(b, ++i3);
+
+            Integer i4 = mapS.get(s);
+            mapS.put(s, ++i4);
+
+            Integer i5 = mapG.get(g);
+            mapG.put(g, ++i5);
+
+
+        }
+
+
+        Iterator<Map.Entry<Integer, SortFive>> entries = map.entrySet().iterator();
+
+        while (entries.hasNext()) {
+
+            Map.Entry<Integer, SortFive> entry = entries.next();
+            Integer key = entry.getKey();
+
+            Integer integer = mapRest.get(key);
+            if (integer != null) {
+
+            }
+
+        }
+//        Iterator<Map.Entry<Integer, SortFive>> entries = map.entrySet().iterator();
+//
+//        while (entries.hasNext()) {
+//
+//            Map.Entry<Integer, SortFive> entry = entries.next();
+//            Integer key = entry.getKey();
+//
+//            Integer integer = mapRest.get(key);
+//            if (integer != null) {
+//
+//            }
+//
+//        }
+    }
+
+    private static void gapDate() {
         for (int i = startIssue; i < endIssue; i++) {
             connectHtml(getUrl(i));
             if (i % 1000 > 366) {
@@ -71,7 +266,7 @@ public class PLWLottery {
                 String data = element.text();
                 sortFive.setValue(i, data);
             }
-            System.out.println("sortFive:" + sortFive );
+            System.out.println("sortFive:" + sortFive);
             list.add(0, sortFive);
 
         } catch (IOException e) {
@@ -88,6 +283,18 @@ public class PLWLottery {
     public static void save(String content) {
         try {
             FileUtils.write(new File("/home/wzh/lottery_plw.json"), content, "UTF-8");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void loadPlw() {
+        try {
+            String s = FileUtils.readFileToString(new File("/home/wzh/lottery_plw.json"), "UTF-8");
+            if (s != null) {
+                list = new Gson().fromJson(s, new TypeToken<List<SortFive>>() {
+                }.getType());
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
